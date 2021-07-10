@@ -1,0 +1,82 @@
+Serverchat.java:
+
+import java.net.*;
+import java.io.*;
+public class Serverchat {
+	public static void main(String[] args)throws IOException{
+		ServerSocket sock=null;
+		BufferedReader fromClient=null,fromUser=null;
+		PrintWriter toClient=null;
+		Socket client=null;
+		try{
+			sock=new ServerSocket(4444);
+			System.out.println("Server Ready");
+			client=sock.accept();
+			System.out.println("Client connected");
+			fromClient=new BufferedReader(new InputStreamReader(client.getInputStream()));
+			toClient=new PrintWriter(client.getOutputStream());
+			fromUser=new BufferedReader(new InputStreamReader(System.in));
+			String line,Usermsg;
+			while(true){
+				line=fromClient.readLine();
+				if((line==null) || (line.equals("bye")))
+					break;
+				System.out.println("Client:" +line);
+				System.out.print("me:");
+				Usermsg=fromUser.readLine();
+				toClient.println(Usermsg);
+				toClient.flush();
+			}
+			fromClient.close();
+			toClient.close();
+			client.close();
+			System.out.println("Client disconnected");
+		}
+		catch(IOException ioe){
+			System.out.println(ioe);
+		}
+	}
+}
+
+Clientchat.java:
+
+import java.net.*;
+import java.io.*;
+public class Clientchat {
+	public static void main(String[] args)throws IOException{
+		BufferedReader fromServer=null,fromUser=null;
+		PrintWriter toServer=null;
+		Socket sock=null;
+		try{
+			if(args.length==0)
+				sock=new Socket(InetAddress.getLocalHost(),4444);
+			else
+				sock=new Socket(InetAddress.getByName(args[0]),4444);
+			fromServer=new BufferedReader(new InputStreamReader(sock.getInputStream()));
+			fromUser=new BufferedReader(new InputStreamReader(System.in));
+			toServer=new PrintWriter(sock.getOutputStream(),true);
+			String Usermsg,Servmsg;
+			System.out.println("Type \"bye\" to quit");
+			while(true){
+				System.out.print("me:");
+				Usermsg=fromUser.readLine();
+				if(Usermsg==null||Usermsg.equals("bye")){
+					toServer.println("bye");
+					break;
+				}
+				else
+					toServer.println(Usermsg);
+				Servmsg=fromServer.readLine();
+				System.out.println("Server:" +Servmsg);
+			}
+			fromUser.close();
+			fromServer.close();
+			toServer.close();
+			sock.close();
+		}
+		catch(IOException ioe){
+			System.err.println(ioe);
+		}
+	}
+}
+

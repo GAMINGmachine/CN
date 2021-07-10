@@ -1,0 +1,45 @@
+Serverrpc.java:
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+public class Serverrpc {
+	public static void main(String[] args)throws IOException{
+		try{
+			ServerSocket obj=new ServerSocket(139);
+			while(true){
+				Socket obj1=obj.accept();
+				DataInputStream din=new DataInputStream(obj1.getInputStream());
+				DataOutputStream dout=new DataOutputStream(obj1.getOutputStream());
+				String str=din.readLine();
+				Process p=Runtime.getRuntime().exec(str);
+			}
+		}
+		catch(Exception e){
+			System.out.println(e);
+		}
+	}
+}
+
+Clientrpc.java:
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+public class Clientrpc {
+	public static void main(String[] args)throws IOException{
+		try{
+			BufferedReader in=new BufferedReader(new InputStreamReader(System.in));
+			Socket clsct=new Socket("127.0.0.1",139);
+			DataInputStream din=new DataInputStream(clsct.getInputStream());
+			DataOutputStream dout=new DataOutputStream(clsct.getOutputStream());
+			System.out.println("Enter String");
+			String str=in.readLine();
+			dout.writeBytes(str+'\n');
+			clsct.close();
+		}
+		catch(Exception e){
+			System.out.println(e);
+		}
+	}
+}
